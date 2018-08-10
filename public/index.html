@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JSON example</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        .ng-hide {
+            display: none !important;
+        }
+        .ng-show {
+            display: block !important;
+        }
+    </style>
+</head>
+<body class="p-2">
+<h1>JSON Server AJAX testing</h1>
+<h5>Load and send btn block</h5>
+<div class="card p-2 mb-4" id="message"></div>
+<button class="btn btn-primary mb-4 " id="loadData">Load data</button>
+<button class="btn btn-info mb-4 " id="sendData">Send data</button>
+
+<h5>prev and next btn block</h5>
+<div class="card p-2 mb-4" id="pageinfo"></div>
+<button class="btn mb-4" id="prev">Prev</button>
+<button class="btn mb-4" id="next">Next</button>
+
+<h5>My form</h5>
+<form class="card card-body mb-4" id="myForm" action="">
+    <div class="form-group"><input class="form-control" type="text" name="first" value="Jason"></div>
+    <div class="form-group"><input class="form-control" type="text" name="last" value="Tester"></div>
+    <div class="form-group"><input class="form-control" type="text" name="company" value="ACME"></div>
+    <div class="form-group"><button class="btn btn-primary" type="submit">Send data</button></div>
+</form>
+<h5>Output Data</h5>
+<div id="output"></div>
+
+
+<h5>Search block</h5>
+<div class="card card-body mb-4">
+    <div class="form-group row">
+        <input class="form-control col-4 mr-2" type="text" name="search"><button class="btn btn-primary col-1" id="search">Search</button></div>
+    </div>
+<h5>Add comment</h5>
+<div class="card card-body mb-4">
+    <div class="form-group row">
+        <textarea class="form-control col-4 mr-2" id="comments"></textarea><button class="btn btn-primary col-1" id="addComment">Add comment</button>
+    </div>
+</div>
+
+</body>
+<script>
+    var btnLoadObj, btnSendObj, xml, messageObj, outputObj, currentID, searchObj, commentsObj;
+    btnLoadObj = document.getElementById('loadData');
+    btnSendObj = document.getElementById('sendData');
+    btnPrevObj = document.getElementById('prev');
+    btnNextObj = document.getElementById('next');
+    messageObj = document.querySelector('#message');
+    outputObj = document.querySelector('#output');
+    currentID = 1;
+
+
+    btnLoadObj.addEventListener('click', function(){
+        makeGet()
+    });
+    btnSendObj.addEventListener('click', function(){
+        makePost()
+    });
+
+    btnPrevObj.addEventListener('click', function(){
+        currentID++;
+        loadPage('prev');
+    });
+    btnNextObj.addEventListener('click', function(){
+        currentID--;
+        loadPage('next');
+    });
+    document.getElementById('myForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        let first = document.querySelector('input[name="first"]').value;
+        let last = document.querySelector('input[name="last"]').value;
+        let company = document.querySelector('input[name="company"]').value;
+        console.log("first : ",first, "last : ",last, "company : ",company);
+        makePost('http://localhost:3000/posts', 'first='+first+'&last='+last+'&company='+company);
+    });
+    document.getElementById('search').addEventListener('click', function(){
+        outputObj.innerHTML = '';
+        searchObj = document.querySelector('input[name="search"]').value;
+        xml = setUpXML();
+        xml.open('GET', 'http://localhost:3000/posts?q='+searchObj, true);
+        xml.send();
+        xml.onreadystatechange = function() {
+            if(xml.readyState === 4 && xml.status === 200) {
+                console.log(xml.responseText);
+                var responseObj = JSON.parse(xml.response);
+                for(var x = 0; x< responseObj.length; x++) {
+                    console.log(x, responseObj[x]);
+                    outputObj.innerHTML += '<b>first: </b>'+responseObj[x]['first']+' <b>last: </b>'+ responseObj[x]['last']+' <b>company: </b>'+responseObj[x]['company']+'</br>';
+                }
+                //messageObj.innerHTML = data;
+                //console.log(JSON.parse(xml.response));
+            }
+        }
+        searchObj = '';
+    });
+    document.getElementById('addComment').addEventListener('click', function(){
+        commentsObj = document.querySelector('#comments').value;
+        var data = 'postID='+currentID+'&body='+commentsObj;
+        xml = setUpXML();
+        xml.open('POST', 'http://localhost:3000/comments', data, true);
+        xml.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xml.send(data);
+        xml.onreadystatechange = function() {
+            if(xml.readyState === 4 && xml.status === 200) {
+                console.log(xml.responseText);
+                var data = JSON.stringify(xml.response);
+                messageObj.innerHTML = data;
+                //console.log(JSON.parse(xml.response));
+            }
+        }
+        commentsObj = '';
+    });
+    btnPrevObj.addEventListener('click', function(){
+
+    });
+
+    function loadPage(param){
+        outputObj.innerHTML = '';
+        xml = setUpXML();
+        xml.open('GET', 'http://localhost:3000/posts?id='+currentID, true);
+        xml.send();
+        xml.onreadystatechange = function() {
+            if(xml.readyState === 4 && xml.status === 200) {
+                //console.log(xml.responseText);
+                var responseObj = JSON.parse(xml.response);
+                for(var key in responseObj[0]) {
+                    console.log(key, responseObj[0][key]);
+                    outputObj.innerHTML += '<b>'+key+'</b>: '+ responseObj[0][key]+'</br>';
+                }
+                //messageObj.innerHTML = data;
+                //console.log(JSON.parse(xml.response));
+            }
+        }
+    }
+
+    function setUpXML(){
+        if(window.XMLHttpRequest) {
+            xml = new XMLHttpRequest();
+        } else if(window.ActiveXObject) {
+            xml = new ActiveXObject('Microsoft.XMLHttp');
+        }
+        return xml;
+    }
+
+    function makeGet(url){
+        xml = setUpXML();
+        xml.open('GET', url, true);
+        xml.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xml.send();
+        xml.onreadystatechange = function() {
+            if(xml.readyState === 4 && xml.status === 200) {
+                console.log(xml.responseText);
+                var data = JSON.stringify(xml.response);
+                messageObj.innerHTML = data;
+                console.log(JSON.parse(xml.response));
+            }
+        }
+    }
+
+    function makePost(url, data){
+        //var data = 'first=Jane&last=Shaik&company=AI&another=Wiiii';
+        xml = setUpXML();
+        xml.open('POST', url, data, true);
+        xml.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xml.send(data);
+        xml.onreadystatechange = function() {
+            if(xml.readyState === 4 && xml.status === 200) {
+                console.log(xml.responseText);
+                var data = JSON.stringify(xml.response);
+                messageObj.innerHTML = data;
+                console.log(JSON.parse(xml.response));
+            }
+        }
+    }
+</script>
+</html>

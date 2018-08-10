@@ -1,0 +1,64 @@
+{
+  "posts": [
+    {
+      "id": 1,
+      "first": "Soujanya",
+      "last": "J",
+      "company": "pramati technologies"
+    },
+    {
+      "id": 2
+    },
+    {
+      "first": "Sam",
+      "last": "Jane",
+      "company": "IIIT-H",
+      "id": 3
+    },
+    {
+      "first": "Ajay",
+      "last": "Jana",
+      "company": "MobileIndustry",
+      "another": "HelloWorld",
+      "id": 4
+    },
+    {
+      "first": "Jane",
+      "last": "Shaik",
+      "company": "AI",
+      "another": "Wiiii",
+      "id": 5
+    },
+    {
+      "first": "Janet",
+      "last": "Jakson",
+      "company": "IIM",
+      "id": 6
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "Some comment",
+      "postID": 1
+    },
+    {
+      "postID": "3",
+      "body": "test1",
+      "id": 2
+    },
+    {
+      "postID": "4",
+      "body": "Mobile specialist",
+      "id": 3
+    },
+    {
+      "postID": "5",
+      "body": "Tweets and sweets",
+      "id": 4
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}
