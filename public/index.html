@@ -18,7 +18,7 @@
 <h5>Load and send btn block</h5>
 <div class="card p-2 mb-4" id="message"></div>
 <button class="btn btn-primary mb-4 " id="loadData">Load data</button>
-<button class="btn btn-info mb-4 " id="sendData">Send data</button>
+<button class="btn btn-info mb-4 ng-hide" id="sendData">Send data</button>
 
 <h5>prev and next btn block</h5>
 <div class="card p-2 mb-4" id="pageinfo"></div>
@@ -44,7 +44,7 @@
 <h5>Add comment</h5>
 <div class="card card-body mb-4">
     <div class="form-group row">
-        <textarea class="form-control col-4 mr-2" id="comments"></textarea><button class="btn btn-primary col-1" id="addComment">Add comment</button>
+        <textarea class="form-control col-4 mr-2" id="comments"></textarea><button class="btn btn-primary" id="addComment">Add comment</button>
     </div>
 </div>
 
@@ -61,7 +61,7 @@
 
 
     btnLoadObj.addEventListener('click', function(){
-        makeGet()
+        makeGet('http://localhost:3000/posts')
     });
     btnSendObj.addEventListener('click', function(){
         makePost()
@@ -159,10 +159,10 @@
         xml.send();
         xml.onreadystatechange = function() {
             if(xml.readyState === 4 && xml.status === 200) {
-                console.log(xml.responseText);
+                //console.log(xml.responseText);
                 var data = JSON.stringify(xml.response);
                 messageObj.innerHTML = data;
-                console.log(JSON.parse(xml.response));
+                //console.log(JSON.parse(xml.response));
             }
         }
     }
